@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Analytics Data Platform Blueprint</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-darker: #1e293b;
+            --card-bg: #1a2540;
+            --text-light: #f1f5f9;
+            --text-gray: #cbd5e1;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        header h1 {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+        }
+
+        nav {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        nav button {
+            background: rgba(37, 99, 235, 0.2);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.7rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        nav button:hover, nav button.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+            padding: 2rem 0;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 1rem;
+        }
+
+        .section-intro {
+            background: rgba(37, 99, 235, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: rgba(26, 37, 64, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 0.8rem;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            background: rgba(26, 37, 64, 0.8);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+        }
+
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .card p {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(37, 99, 235, 0.2);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .status-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .flow-diagram {
+            background: rgba(26, 37, 64, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 0.8rem;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .flow-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin: 0.5rem;
+            font-weight: 600;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .flow-arrow {
+            display: inline-block;
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin: 0 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #4ade80;
+            line-height: 1.5;
+        }
+
+        .code-label {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .expandable {
+            background: rgba(26, 37, 64, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .expandable-header {
+            background: rgba(37, 99, 235, 0.1);
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .expandable-header:hover {
+            background: rgba(37, 99, 235, 0.2);
+        }
+
+        .expandable-content {
+            display: none;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .expandable-content.show {
+            display: block;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+
+        .expandable-content.show .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .metric-box {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid var(--border);
+            border-radius: 0.8rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .metric-label {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        .chat-box {
+            background: rgba(26, 37, 64, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 0.8rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .chat-message {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .chat-user {
+            background: rgba(37, 99, 235, 0.2);
+            border-left: 3px solid var(--primary);
+            margin-left: 2rem;
+        }
+
+        .chat-assistant {
+            background: rgba(139, 92, 246, 0.2);
+            border-left: 3px solid var(--accent);
+            margin-right: 2rem;
+        }
+
+        .chat-label {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .tech-card {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid var(--border);
+            border-radius: 0.8rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .tech-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+        }
+
+        .tech-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .tech-card h3 {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .tech-card p {
+            color: var(--text-gray);
+            font-size: 0.85rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .architecture-svg {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 0.8rem;
+            padding: 2rem;
+            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        footer {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+            color: var(--text-gray);
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            nav {
+                flex-direction: column;
+            }
+
+            nav button {
+                width: 100%;
+            }
+
+            .grid, .dashboard-grid, .tech-stack {
+                grid-template-columns: 1fr;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🚀 Modern Analytics Data Platform Blueprint</h1>
+            <p>Production-Grade Governed Analytics Architecture</p>
+            <nav id="nav">
+                <button class="nav-btn active" data-section="overview">Executive Overview</button>
+                <button class="nav-btn" data-section="architecture">Architecture Diagram</button>
+                <button class="nav-btn" data-section="warehouse">Warehouse Design</button>
+                <button class="nav-btn" data-section="monitoring">Pipeline Monitoring</button>
+                <button class="nav-btn" data-section="analytics">Business Analytics</button>
+                <button class="nav-btn" data-section="ai">AI Analytics</button>
+                <button class="nav-btn" data-section="code">Code Examples</button>
+                <button class="nav-btn" data-section="stack">Tech Stack</button>
+                <button class="nav-btn" data-section="explanation">How It Works</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Executive Overview -->
+    <section id="overview" class="active">
+        <div class="container">
+            <h2>📊 Executive Overview</h2>
+            <div class="section-intro">
+                <p><strong>Transform fragmented raw data into reliable, reusable business intelligence layers.</strong> This platform provides a governed, scalable, and AI-ready analytics infrastructure.</p>
+            </div>
+
+            <div class="flow-diagram">
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="margin: 1rem 0; font-size: 1.1rem; color: var(--text-gray);">📈 Complete Data Pipeline</div>
+                    <div style="margin: 2rem 0;">
+                        <div class="flow-box">Raw Data Sources</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box">Ingestion Layer</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box">Data Warehouse</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box">Transformation</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box">Analytics Marts</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box">BI + AI Layer</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">What This Platform Delivers:</h3>
+            <div class="grid">
+                <div class="card">
+                    <h3>✅ Data Governance</h3>
+                    <p>Centralized data ownership, lineage tracking, and quality assurance across all layers</p>
+                </div>
+                <div class="card">
+                    <h3>⚡ Real-Time Insights</h3>
+                    <p>Daily incremental loads with sub-minute latency for critical business metrics</p>
+                </div>
+                <div class="card">
+                    <h3>🎯 Business-Ready Data</h3>
+                    <p>Pre-built analytics marts for revenue, product, marketing, and finance domains</p>
+                </div>
+                <div class="card">
+                    <h3>🤖 AI Integration</h3>
+                    <p>Semantic layer enabling natural language queries on trusted data</p>
+                </div>
+                <div class="card">
+                    <h3>📊 Self-Service Analytics</h3>
+                    <p>Executive dashboards and exploration tools for all business stakeholders</p>
+                </div>
+                <div class="card">
+                    <h3>🔒 Enterprise Security</h3>
+                    <p>Role-based access control, encryption, audit logging, and compliance monitoring</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Diagram -->
+    <section id="architecture">
+        <div class="container">
+            <h2>🏗️ Architecture Diagram</h2>
+            <div class="section-intro">
+                <p>Animated data flow showing how information moves through the analytics platform from source systems to end-user applications.</p>
+            </div>
+
+            <div class="architecture-svg">
+                <svg width="100%" height="500" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Layer backgrounds -->
+                    <rect x="20" y="20" width="960" height="460" fill="rgba(37,99,235,0.05)" stroke="rgba(37,99,235,0.2)" stroke-width="2" rx="10"/>
+                    
+                    <!-- Layer labels -->
+                    <text x="40" y="45" fill="#60a5fa" font-size="14" font-weight="bold">Sources</text>
+                    <text x="220" y="45" fill="#60a5fa" font-size="14" font-weight="bold">Ingestion</text>
+                    <text x="410" y="45" fill="#60a5fa" font-size="14" font-weight="bold">Warehouse</text>
+                    <text x="610" y="45" fill="#60a5fa" font-size="14" font-weight="bold">Transformation</text>
+                    <text x="800" y="45" fill="#60a5fa" font-size="14" font-weight="bold">Consumption</text>
+
+                    <!-- Sources -->
+                    <g id="sources">
+                        <rect x="40" y="100" width="100" height="60" fill="rgba(37,99,235,0.2)" stroke="#2563eb" stroke-width="2" rx="5"/>
+                        <text x="90" y="135" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">CRM</text>
+                        
+                        <rect x="40" y="180" width="100" height="60" fill="rgba(37,99,235,0.2)" stroke="#2563eb" stroke-width="2" rx="5"/>
+                        <text x="90" y="215" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">Stripe</text>
+                        
+                        <rect x="40" y="260" width="100" height="60" fill="rgba(37,99,235,0.2)" stroke="#2563eb" stroke-width="2" rx="5"/>
+                        <text x="90" y="295" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">PostgreSQL</text>
+                        
+                        <rect x="40" y="340" width="100" height="60" fill="rgba(37,99,235,0.2)" stroke="#2563eb" stroke-width="2" rx="5"/>
+                        <text x="90" y="375" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">Marketing</text>
+                    </g>
+
+                    <!-- Airbyte -->
+                    <g id="ingestion">
+                        <rect x="200" y="150" width="120" height="200" fill="rgba(139,92,246,0.2)" stroke="#8b5cf6" stroke-width="2" rx="5"/>
+                        <text x="260" y="250" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">Airbyte</text>
+                        <text x="260" y="270" text-anchor="middle" fill="#cbd5e1" font-size="11">Incremental Sync</text>
+                    </g>
+
+                    <!-- BigQuery -->
+                    <g id="warehouse">
+                        <rect x="390" y="100" width="110" height="70" fill="rgba(37,99,235,0.2)" stroke="#2563eb" stroke-width="2" rx="5"/>
+                        <text x="445" y="140" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">Raw Layer</text>
+                        
+                        <rect x="390" y="190" width="110" height="70" fill="rgba(37,99,235,0.2)" stroke="#2563eb" stroke-width="2" rx="5"/>
+                        <text x="445" y="230" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">Staging Layer</text>
+                        
+                        <rect x="390" y="280" width="110" height="70" fill="rgba(37,99,235,0.2)" stroke="#2563eb" stroke-width="2" rx="5"/>
+                        <text x="445" y="320" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">BigQuery</text>
+                    </g>
+
+                    <!-- dbt -->
+                    <g id="transformation">
+                        <rect x="580" y="150" width="120" height="200" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="2" rx="5"/>
+                        <text x="640" y="245" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">dbt</text>
+                        <text x="640" y="265" text-anchor="middle" fill="#cbd5e1" font-size="11">Data Models</text>
+                    </g>
+
+                    <!-- Consumption -->
+                    <g id="consumption">
+                        <rect x="780" y="100" width="100" height="60" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2" rx="5"/>
+                        <text x="830" y="135" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">BI Tools</text>
+                        
+                        <rect x="780" y="180" width="100" height="60" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2" rx="5"/>
+                        <text x="830" y="215" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">Dashboards</text>
+                        
+                        <rect x="780" y="260" width="100" height="60" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2" rx="5"/>
+                        <text x="830" y="295" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">AI Analytics</text>
+                        
+                        <rect x="780" y="340" width="100" height="60" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2" rx="5"/>
+                        <text x="830" y="375" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">Reporting</text>
+                    </g>
+
+                    <!-- Arrows with animation -->
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#60a5fa" />
+                        </marker>
+                    </defs>
+                    
+                    <path d="M 140 200 L 200 200" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="1s" repeatCount="indefinite" />
+                    </path>
+                    
+                    <path d="M 320 250 L 390 250" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="1s" repeatCount="indefinite" />
+                    </path>
+                    
+                    <path d="M 500 250 L 580 250" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="1s" repeatCount="indefinite" />
+                    </path>
+                    
+                    <path d="M 700 250 L 780 250" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="1s" repeatCount="indefinite" />
+                    </path>
+                </svg>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">Data Flow Overview:</h3>
+            <div class="grid">
+                <div class="card">
+                    <h3>1️⃣ Sources</h3>
+                    <p>Data originates from multiple systems: CRM, payment processors, databases, and marketing platforms</p>
+                </div>
+                <div class="card">
+                    <h3>2️⃣ Airbyte Ingestion</h3>
+                    <p>Automated connectors handle incremental syncing with retry logic and schema change detection</p>
+                </div>
+                <div class="card">
+                    <h3>3️⃣ BigQuery Warehouse</h3>
+                    <p>Raw and staging layers store untransformed data, organized by source</p>
+                </div>
+                <div class="card">
+                    <h3>4️⃣ dbt Transformation</h3>
+                    <p>SQL models create business-ready tables with validations and documentation</p>
+                </div>
+                <div class="card">
+                    <h3>5️⃣ Analytics Marts</h3>
+                    <p>Pre-aggregated tables optimized for specific business domains</p>
+                </div>
+                <div class="card">
+                    <h3>6️⃣ Consumption</h3>
+                    <p>BI tools, dashboards, and AI applications query trusted data</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Warehouse Design -->
+    <section id="warehouse">
+        <div class="container">
+            <h2>🏢 Data Warehouse Design</h2>
+            <div class="section-intro">
+                <p>Multi-layered architecture following the medallion pattern: Raw → Staging → Analytics Marts</p>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">📥 Raw Layer (Untransformed Data)</h3>
+            <div class="grid">
+                <div class="card">
+                    <h3>raw_customers</h3>
+                    <p>Customer profiles from CRM: IDs, names, emails, company info</p>
+                    <div class="badge">source: CRM</div>
+                    <div class="badge">updated: daily</div>
+                </div>
+                <div class="card">
+                    <h3>raw_transactions</h3>
+                    <p>Financial records: amounts, dates, statuses, customer IDs</p>
+                    <div class="badge">source: Stripe</div>
+                    <div class="badge">updated: hourly</div>
+                </div>
+                <div class="card">
+                    <h3>raw_events</h3>
+                    <p>Product events: signups, logins, feature usage, conversions</p>
+                    <div class="badge">source: Product DB</div>
+                    <div class="badge">updated: real-time</div>
+                </div>
+                <div class="card">
+                    <h3>raw_campaigns</h3>
+                    <p>Marketing campaigns: names, budgets, channels, performance</p>
+                    <div class="badge">source: Marketing API</div>
+                    <div class="badge">updated: daily</div>
+                </div>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">🔄 Staging Layer (Cleaned & Standardized)</h3>
+            <table>
+                <tr>
+                    <th>Model</th>
+                    <th>Purpose</th>
+                    <th>Key Transformations</th>
+                </tr>
+                <tr>
+                    <td><strong>stg_customers</strong></td>
+                    <td>Cleaned customer data</td>
+                    <td>Deduplication, null handling, type casting</td>
+                </tr>
+                <tr>
+                    <td><strong>stg_transactions</strong></td>
+                    <td>Validated transactions</td>
+                    <td>Currency conversion, date normalization</td>
+                </tr>
+                <tr>
+                    <td><strong>stg_events</strong></td>
+                    <td>Standardized events</td>
+                    <td>Event classification, timestamp parsing</td>
+                </tr>
+                <tr>
+                    <td><strong>stg_campaigns</strong></td>
+                    <td>Prepared campaigns</td>
+                    <td>Budget allocation, channel standardization</td>
+                </tr>
+            </table>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">📊 Analytics Marts (Business-Ready)</h3>
+            
+            <h4 style="color: var(--primary); margin: 1.5rem 0 1rem 0;">Revenue Mart</h4>
+            <div class="grid">
+                <div class="card">
+                    <h3>fact_revenue</h3>
+                    <p><strong>Dimensions:</strong> customer, date, product, country</p>
+                    <p><strong>Metrics:</strong> revenue, order count, transaction count</p>
+                </div>
+                <div class="card">
+                    <h3>dim_customer</h3>
+                    <p><strong>Attributes:</strong> ID, email, country, signup_date, status</p>
+                    <p><strong>Use:</strong> Customer analysis, segmentation</p>
+                </div>
+                <div class="card">
+                    <h3>dim_date</h3>
+                    <p><strong>Attributes:</strong> date, year, month, quarter, day_of_week</p>
+                    <p><strong>Use:</strong> Time-series analysis</p>
+                </div>
+            </div>
+
+            <h4 style="color: var(--primary); margin: 1.5rem 0 1rem 0;">Product Mart</h4>
+            <div class="grid">
+                <div class="card">
+                    <h3>fact_events</h3>
+                    <p><strong>Events:</strong> signup, login, feature_use, upgrade</p>
+                    <p><strong>Attributes:</strong> user_id, timestamp, event_type</p>
+                </div>
+                <div class="card">
+                    <h3>user_sessions</h3>
+                    <p><strong>Session data:</strong> duration, page views, conversion</p>
+                    <p><strong>Use:</strong> User behavior analysis</p>
+                </div>
+                <div class="card">
+                    <h3>conversion_funnel</h3>
+                    <p><strong>Stages:</strong> awareness, consideration, conversion, retention</p>
+                    <p><strong>Metrics:</strong> drop-off rates, conversion rates</p>
+                </div>
+            </div>
+
+            <h4 style="color: var(--primary); margin: 1.5rem 0 1rem 0;">Marketing & Finance Marts</h4>
+            <div class="grid">
+                <div class="card">
+                    <h3>campaign_performance</h3>
+                    <p>ROI, spend, leads, conversions by campaign</p>
+                </div>
+                <div class="card">
+                    <h3>attribution_model</h3>
+                    <p>First-touch, last-touch, multi-touch attribution</p>
+                </div>
+                <div class="card">
+                    <h3>partner_performance</h3>
+                    <p>Commission, revenue generated, conversion rates</p>
+                </div>
+                <div class="card">
+                    <h3>reconciliation_report</h3>
+                    <p>Expected vs actual revenue, variances, discrepancies</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pipeline Monitoring -->
+    <section id="monitoring">
+        <div class="container">
+            <h2>📡 Pipeline Monitoring Dashboard</h2>
+            <div class="section-intro">
+                <p>Real-time visibility into data pipeline health, freshness, and quality metrics</p>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">Pipeline Status</h3>
+            <div class="dashboard-grid">
+                <div class="metric-box">
+                    <div class="metric-label">Airbyte Sync</div>
+                    <div class="metric-value" style="color: var(--success);">✓</div>
+                    <span class="status-badge status-success">SUCCESS</span>
+                    <div class="metric-label" style="margin-top: 0.5rem;">Last: 2 hours ago</div>
+                </div>
+
+                <div class="metric-box">
+                    <div class="metric-label">BigQuery Load</div>
+                    <div class="metric-value" style="color: var(--success);">✓</div>
+                    <span class="status-badge status-success">SUCCESS</span>
+                    <div class="metric-label" style="margin-top: 0.5rem;">Last: 2 hours ago</div>
+                </div>
+
+                <div class="metric-box">
+                    <div class="metric-label">dbt Run</div>
+                    <div class="metric-value" style="color: var(--success);">✓</div>
+                    <span class="status-badge status-success">SUCCESS</span>
+                    <div class="metric-label" style="margin-top: 0.5rem;">Last: 1 hour ago</div>
+                </div>
+
+                <div class="metric-box">
+                    <div class="metric-label">Data Quality</div>
+                    <div class="metric-value" style="color: var(--success);">✓</div>
+                    <span class="status-badge status-success">PASS</span>
+                    <div class="metric-label" style="margin-top: 0.5rem;">All checks passed</div>
+                </div>
+
+                <div class="metric-box">
+                    <div class="metric-label">Data Freshness</div>
+                    <div class="metric-value">2h</div>
+                    <span class="status-badge status-success">FRESH</span>
+                    <div class="metric-label" style="margin-top: 0.5rem;">Max: 24h</div>
+                </div>
+
+                <div class="metric-box">
+                    <div class="metric-label">Failed Jobs</div>
+                    <div class="metric-value">0</div>
+                    <span class="status-badge status-success">NONE</span>
+                    <div class="metric-label" style="margin-top: 0.5rem;">Last 24h</div>
+                </div>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">Quality Metrics</h3>
+            <table>
+                <tr>
+                    <th>Dataset</th>
+                    <th>Completeness</th>
+                    <th>Freshness</th>
+                    <th>Uniqueness</th>
+                    <th>Validity</th>
+                </tr>
+                <tr>
+                    <td>raw_customers</td>
+                    <td>100%</td>
+                    <td>2h old</td>
+                    <td>✓ 100%</td>
+                    <td>✓ Pass</td>
+                </tr>
+                <tr>
+                    <td>raw_transactions</td>
+                    <td>99.8%</td>
+                    <td>30m old</td>
+                    <td>✓ 100%</td>
+                    <td>✓ Pass</td>
+                </tr>
+                <tr>
+                    <td>raw_events</td>
+                    <td>98.5%</td>
+                    <td>5m old</td>
+                    <td>✓ 99.9%</td>
+                    <td>✓ Pass</td>
+                </tr>
+                <tr>
+                    <td>fact_revenue</td>
+                    <td>100%</td>
+                    <td>1h old</td>
+                    <td>✓ 100%</td>
+                    <td>✓ Pass</td>
+                </tr>
+            </table>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">Great Expectations Checks</h3>
+            <div class="grid">
+                <div class="card">
+                    <h3>✓ Freshness</h3>
+                    <p>Data must arrive daily</p>
+                    <p style="margin-top: 1rem; color: var(--success); font-weight: 600;">Status: PASSING</p>
+                </div>
+                <div class="card">
+                    <h3>✓ Completeness</h3>
+                    <p>Required columns exist and populated</p>
+                    <p style="margin-top: 1rem; color: var(--success); font-weight: 600;">Status: PASSING</p>
+                </div>
+                <div class="card">
+                    <h3>✓ Accuracy</h3>
+                    <p>No negative revenue or future dates</p>
+                    <p style="margin-top: 1rem; color: var(--success); font-weight: 600;">Status: PASSING</p>
+                </div>
+                <div class="card">
+                    <h3>✓ Uniqueness</h3>
+                    <p>Primary keys are unique</p>
+                    <p style="margin-top: 1rem; color: var(--success); font-weight: 600;">Status: PASSING</p>
+                </div>
+                <div class="card">
+                    <h3>✓ Consistency</h3>
+                    <p>Foreign keys match reference tables</p>
+                    <p style="margin-top: 1rem; color: var(--success); font-weight: 600;">Status: PASSING</p>
+                </div>
+                <div class="card">
+                    <h3>✓ Volume Anomalies</h3>
+                    <p>Record counts within expected ranges</p>
+                    <p style="margin-top: 1rem; color: var(--success); font-weight: 600;">Status: PASSING</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Business Analytics -->
+    <section id="analytics">
+        <div class="container">
+            <h2>📈 Business Analytics Examples</h2>
+            <div class="section-intro">
+                <p>Sample dashboards and KPIs powered by the platform</p>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">💰 Revenue Analytics</h3>
+            <div class="dashboard-grid">
+                <div class="metric-box">
+                    <div class="metric-label">Monthly Revenue</div>
+                    <div class="metric-value">$2.4M</div>
+                    <div style="font-size: 0.85rem; color: var(--success);">↑ 12% MoM</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Customer Count</div>
+                    <div class="metric-value">8,420</div>
+                    <div style="font-size: 0.85rem; color: var(--success);">↑ 5% MoM</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Average Order Value</div>
+                    <div class="metric-value">$285</div>
+                    <div style="font-size: 0.85rem; color: var(--warning);">↓ 2% MoM</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Customer Lifetime Value</div>
+                    <div class="metric-value">$4,200</div>
+                    <div style="font-size: 0.85rem; color: var(--success);">↑ 8% YoY</div>
+                </div>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">🎯 Product Analytics</h3>
+            <div class="grid">
+                <div class="card">
+                    <h3>Signup Funnel</h3>
+                    <p><strong>Step 1:</strong> Visit Website - 100,000</p>
+                    <p><strong>Step 2:</strong> Start Trial - 25,000 (25%)</p>
+                    <p><strong>Step 3:</strong> Activate - 5,000 (20%)</p>
+                    <p><strong>Step 4:</strong> Convert - 1,000 (20%)</p>
+                    <p style="margin-top: 1rem; color: var(--text-gray); font-size: 0.85rem;">Overall Conversion: 1%</p>
+                </div>
+                <div class="card">
+                    <h3>Retention Cohorts</h3>
+                    <p><strong>Month 1:</strong> 100% (baseline)</p>
+                    <p><strong>Month 2:</strong> 85% (churn: 15%)</p>
+                    <p><strong>Month 3:</strong> 72% (churn: 13%)</p>
+                    <p><strong>Month 6:</strong> 45% (churn: 37%)</p>
+                    <p style="margin-top: 1rem; color: var(--text-gray); font-size: 0.85rem;">Stabilizing at 40% after month 6</p>
+                </div>
+                <div class="card">
+                    <h3>Feature Adoption</h3>
+                    <p><strong>Core Feature:</strong> 92% of users</p>
+                    <p><strong>Advanced Feature:</strong> 45% of users</p>
+                    <p><strong>Premium Feature:</strong> 12% of users</p>
+                    <p><strong>API Access:</strong> 8% of users</p>
+                    <p style="margin-top: 1rem; color: var(--text-gray); font-size: 0.85rem;">Strong core adoption, growth opportunity in advanced features</p>
+                </div>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">💸 Finance Analytics</h3>
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Expected</th>
+                    <th>Actual</th>
+                    <th>Variance</th>
+                    <th>Status</th>
+                </tr>
+                <tr>
+                    <td>Revenue</td>
+                    <td>$2.5M</td>
+                    <td>$2.4M</td>
+                    <td>-$100K (-4%)</td>
+                    <td><span class="status-badge status-warning">Monitor</span></td>
+                </tr>
+                <tr>
+                    <td>Collections</td>
+                    <td>$2.3M</td>
+                    <td>$2.35M</td>
+                    <td>+$50K (+2%)</td>
+                    <td><span class="status-badge status-success">Good</span></td>
+                </tr>
+                <tr>
+                    <td>Invoices</td>
+                    <td>8,500</td>
+                    <td>8,420</td>
+                    <td>-80 (-1%)</td>
+                    <td><span class="status-badge status-success">Good</span></td>
+                </tr>
+                <tr>
+                    <td>Discrepancies</td>
+                    <td>0</td>
+                    <td>3</td>
+                    <td>+3</td>
+                    <td><span class="status-badge status-warning">Investigate</span></td>
+                </tr>
+            </table>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">🎯 Marketing Analytics</h3>
+            <div class="grid">
+                <div class="card">
+                    <h3>Campaign Performance</h3>
+                    <p><strong>Email Campaign:</strong> 45% open rate, 8% CTR</p>
+                    <p><strong>Paid Search:</strong> $2.50 CPC, 3.2% conversion</p>
+                    <p><strong>Social Media:</strong> 2.1% engagement, $5 CPM</p>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-gray);">Email and Paid Search showing strongest ROI</p>
+                </div>
+                <div class="card">
+                    <h3>Attribution Model</h3>
+                    <p><strong>First Touch:</strong> 35% of conversions</p>
+                    <p><strong>Last Touch:</strong> 40% of conversions</p>
+                    <p><strong>Multi-touch:</strong> 25% of conversions</p>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-gray);">Multi-channel journeys common for enterprise customers</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Analytics Assistant -->
+    <section id="ai">
+        <div class="container">
+            <h2>🤖 AI Analytics Assistant Demo</h2>
+            <div class="section-intro">
+                <p>Natural language interface to query trusted data using LLM-powered SQL generation</p>
+            </div>
+
+            <div class="chat-box">
+                <div class="chat-message chat-user">
+                    <div class="chat-label">📊 User</div>
+                    <p>"Why did revenue decrease last month?"</p>
+                </div>
+
+                <div class="chat-message chat-assistant">
+                    <div class="chat-label">🤖 AI Assistant</div>
+                    <p><strong>Revenue Analysis:</strong></p>
+                    <p>Revenue declined 4% from $2.5M to $2.4M. Key factors:</p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>Customer churn increased 8% (new metric)</li>
+                        <li>Conversion rate dropped from 1.2% to 1.0%</li>
+                        <li>Average order value decreased $15 (5%)</li>
+                        <li>New customer acquisition down 12%</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">📌 <strong>Recommendation:</strong> Focus on retention programs and email campaign optimization.</p>
+                </div>
+
+                <div class="chat-message chat-user">
+                    <div class="chat-label">📊 User</div>
+                    <p>"Which marketing channels have the best ROI?"</p>
+                </div>
+
+                <div class="chat-message chat-assistant">
+                    <div class="chat-label">🤖 AI Assistant</div>
+                    <p><strong>Marketing ROI Analysis:</strong></p>
+                    <table style="margin: 1rem 0; font-size: 0.9rem;">
+                        <tr style="border-bottom: 1px solid rgba(203, 213, 225, 0.3);">
+                            <td style="padding: 0.5rem;"><strong>Channel</strong></td>
+                            <td style="padding: 0.5rem;"><strong>ROI</strong></td>
+                            <td style="padding: 0.5rem;"><strong>CPA</strong></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(203, 213, 225, 0.3);">
+                            <td style="padding: 0.5rem;">Email</td>
+                            <td style="padding: 0.5rem; color: var(--success);">850%</td>
+                            <td style="padding: 0.5rem;">$12</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(203, 213, 225, 0.3);">
+                            <td style="padding: 0.5rem;">Organic Search</td>
+                            <td style="padding: 0.5rem; color: var(--success);">620%</td>
+                            <td style="padding: 0.5rem;">$18</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(203, 213, 225, 0.3);">
+                            <td style="padding: 0.5rem;">Paid Search</td>
+                            <td style="padding: 0.5rem; color: var(--success);">380%</td>
+                            <td style="padding: 0.5rem;">$35</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;">Social Media</td>
+                            <td style="padding: 0.5rem; color: var(--warning);">180%</td>
+                            <td style="padding: 0.5rem;">$62</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="chat-message chat-user">
+                    <div class="chat-label">📊 User</div>
+                    <p>"Which customer segments are most profitable?"</p>
+                </div>
+
+                <div class="chat-message chat-assistant">
+                    <div class="chat-label">🤖 AI Assistant</div>
+                    <p><strong>Customer Profitability Segmentation:</strong></p>
+                    <p style="margin-top: 0.5rem;"><strong>1. Enterprise Segment:</strong> 15% of customers, 55% of revenue, $18K LTV</p>
+                    <p><strong>2. Mid-Market Segment:</strong> 35% of customers, 35% of revenue, $4.2K LTV</p>
+                    <p><strong>3. SMB Segment:</strong> 50% of customers, 10% of revenue, $850 LTV</p>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-gray);">💡 <strong>Insight:</strong> Enterprise expansion and retention drives 55% of revenue. Consider dedicated support team for this segment.</p>
+                </div>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">How the AI Assistant Works</h3>
+            <div class="flow-diagram" style="text-align: center;">
+                <p style="margin-bottom: 1.5rem; color: var(--text-gray);">Natural Language Processing Pipeline</p>
+                <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1rem;">
+                    <div class="flow-box" style="min-width: 140px;">User Question</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box" style="min-width: 140px;">LLM Processing</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box" style="min-width: 140px;">SQL Generation</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box" style="min-width: 140px;">BigQuery Execution</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box" style="min-width: 140px;">Response Formatting</div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>🔌 LangChain Integration</h3>
+                    <p>Parse user questions and construct SQL queries using LangChain's tool-calling framework</p>
+                </div>
+                <div class="card">
+                    <h3>📊 Semantic Layer</h3>
+                    <p>Define business metrics and dimensions to make queries more accurate</p>
+                </div>
+                <div class="card">
+                    <h3>✅ Validation & Safety</h3>
+                    <p>Validate generated SQL before execution, implement query limits</p>
+                </div>
+                <div class="card">
+                    <h3>📚 Context Window</h3>
+                    <p>Provide schema documentation and example queries for better accuracy</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Examples -->
+    <section id="code">
+        <div class="container">
+            <h2>💻 Code Examples</h2>
+            <div class="section-intro">
+                <p>Production-ready code snippets from the platform</p>
+            </div>
+
+            <div class="expandable">
+                <div class="expandable-header">
+                    <span>📊 dbt Model Example: fact_revenue.sql</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="expandable-content">
+                    <div class="code-block"><span class="code-label">-- models/marts/revenue/fact_revenue.sql</span>{{config(
+    materialized='table',
+    cluster_by=['date', 'customer_id']
+)}}
+
+with transactions as (
+    select * from {{ ref('stg_transactions') }}
+),
+
+customers as (
+    select * from {{ ref('stg_customers') }}
+),
+
+revenue as (
+    select
+        t.transaction_id,
+        t.customer_id,
+        c.email,
+        t.amount as revenue,
+        t.currency,
+        t.transaction_date as date,
+        extract(year from t.transaction_date) as year,
+        extract(month from t.transaction_date) as month,
+        t.status,
+        created_at as dbt_created_at
+    from transactions t
+    left join customers c on t.customer_id = c.customer_id
+    where t.status = 'completed'
+)
+
+select * from revenue</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expandable">
+                <div class="expandable-header">
+                    <span>🔄 Airflow DAG Example: daily_analytics_pipeline.py</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="expandable-content">
+                    <div class="code-block"><span class="code-label">-- dags/daily_analytics_pipeline.py</span>from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime, timedelta
+
+default_args = {
+    'owner': 'data_engineering',
+    'retries': 3,
+    'retry_delay': timedelta(minutes=5),
+}
+
+with DAG(
+    'daily_analytics_pipeline',
+    default_args=default_args,
+    schedule_interval='0 2 * * *',
+    catchup=False,
+) as dag:
+
+    # Task 1: Check source availability
+    check_sources = PythonOperator(
+        task_id='check_source_availability',
+        python_callable=check_sources_function,
+    )
+
+    # Task 2: Run Airbyte sync
+    run_airbyte = PythonOperator(
+        task_id='run_airbyte_sync',
+        python_callable=run_airbyte_sync,
+    )
+
+    # Task 3: Run dbt models
+    run_dbt = PythonOperator(
+        task_id='run_dbt_models',
+        python_callable=run_dbt_transformations,
+    )
+
+    # Task 4: Run quality checks
+    run_quality = PythonOperator(
+        task_id='run_quality_checks',
+        python_callable=run_great_expectations,
+    )
+
+    check_sources >> run_airbyte >> run_dbt >> run_quality</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expandable">
+                <div class="expandable-header">
+                    <span>🐍 Python Data Quality Example</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="expandable-content">
+                    <div class="code-block"><span class="code-label">-- python/quality/data_quality_checks.py</span>from great_expectations.dataset import PandasDataset
+import pandas as pd
+
+def validate_revenue_data(df):
+    """Validate revenue data quality"""
+    
+    # Check 1: No negative revenue
+    assert (df['amount'] >= 0).all(), "Negative revenue found"
+    
+    # Check 2: No future dates
+    assert (df['transaction_date'] <= pd.Timestamp.now()).all(), 
+        "Future dates found"
+    
+    # Check 3: Customer IDs not null
+    assert df['customer_id'].notna().all(), 
+        "NULL customer IDs found"
+    
+    # Check 4: Amount completeness
+    completeness = df['amount'].notna().sum() / len(df)
+    assert completeness >= 0.99, 
+        f"Completeness {completeness} below threshold"
+    
+    # Check 5: Duplicate transactions
+    duplicates = df.duplicated(subset=['transaction_id']).sum()
+    assert duplicates == 0, f"{duplicates} duplicate transactions"
+    
+    return True</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expandable">
+                <div class="expandable-header">
+                    <span>🤖 AI Assistant Example: LangChain Integration</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="expandable-content">
+                    <div class="code-block"><span class="code-label">-- python/ai/semantic_layer.py</span>from langchain import OpenAI, SQLDatabase, SQLDatabaseChain
+from langchain.prompts import PromptTemplate
+
+# Initialize connection
+db = SQLDatabase.from_uri(
+    "bigquery://project_id/dataset_id"
+)
+
+# Create semantic layer
+SEMANTIC_CONTEXT = """
+You have access to a revenue analytics database with these key tables:
+- fact_revenue: All transactions (revenue, customer_id, date, status)
+- dim_customer: Customer data (customer_id, email, country, status)
+- dim_date: Calendar table (date, year, month, quarter)
+
+Key metrics:
+- MRR: Monthly Recurring Revenue
+- ARR: Annual Recurring Revenue
+- LTV: Customer Lifetime Value
+- Churn Rate: % of customers lost per month
+"""
+
+# Create query chain
+llm = OpenAI(temperature=0)
+db_chain = SQLDatabaseChain.from_llm(
+    llm, db, 
+    verbose=True,
+    prompt=PromptTemplate(
+        input_variables=["input", "table_info"],
+        template=SEMANTIC_CONTEXT + "\n{input}"
+    )
+)
+
+# Example usage
+response = db_chain.run(
+    "What is our monthly revenue by country?"
+)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section id="stack">
+        <div class="container">
+            <h2>🛠️ Technology Stack</h2>
+            <div class="section-intro">
+                <p>Production-grade tools and technologies powering the platform</p>
+            </div>
+
+            <div class="tech-stack">
+                <div class="tech-card">
+                    <div class="tech-icon">📊</div>
+                    <h3>BigQuery</h3>
+                    <p>Serverless cloud data warehouse for petabyte-scale analytics</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🔄</div>
+                    <h3>Airbyte</h3>
+                    <p>Open-source ELT platform with 300+ pre-built connectors</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🏗️</div>
+                    <h3>dbt</h3>
+                    <p>Analytics engineering tool for SQL transformations and documentation</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">⏱️</div>
+                    <h3>Apache Airflow</h3>
+                    <p>Workflow orchestration for complex data pipelines</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🐍</div>
+                    <h3>Python</h3>
+                    <p>General-purpose language for automation and utilities</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🔍</div>
+                    <h3>Great Expectations</h3>
+                    <p>Data validation and quality assurance framework</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🐳</div>
+                    <h3>Docker</h3>
+                    <p>Containerization for reproducible environments</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🔐</div>
+                    <h3>GitHub Actions</h3>
+                    <p>CI/CD workflows for automated testing and deployment</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🤖</div>
+                    <h3>LangChain</h3>
+                    <p>Framework for LLM-powered applications and SQL generation</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">📈</div>
+                    <h3>Looker/Tableau</h3>
+                    <p>BI tools for executive dashboards and self-service analytics</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">📝</div>
+                    <h3>SQL</h3>
+                    <p>Standard query language for data analytics</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🔬</div>
+                    <h3>MLflow</h3>
+                    <p>Machine learning lifecycle management and experiment tracking</p>
+                </div>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">Architecture Benefits</h3>
+            <div class="grid">
+                <div class="card">
+                    <h3>✅ Scalability</h3>
+                    <p>Handle growing data volumes without performance degradation</p>
+                </div>
+                <div class="card">
+                    <h3>✅ Reliability</h3>
+                    <p>Automated retries, monitoring, and alerting ensure data freshness</p>
+                </div>
+                <div class="card">
+                    <h3>✅ Maintainability</h3>
+                    <p>Version control, testing, and documentation for all transformations</p>
+                </div>
+                <div class="card">
+                    <h3>✅ Cost Efficiency</h3>
+                    <p>Serverless components with pay-as-you-go pricing models</p>
+                </div>
+                <div class="card">
+                    <h3>✅ Data Governance</h3>
+                    <p>Lineage tracking, access control, and audit logging</p>
+                </div>
+                <div class="card">
+                    <h3>✅ AI-Ready</h3>
+                    <p>Clean, documented, and trusted data for ML/AI applications</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="explanation">
+        <div class="container">
+            <h2>🎯 How It All Works Together</h2>
+            <div class="section-intro">
+                <p>Complete system flow from raw data to AI-powered insights</p>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">📋 Step-by-Step Process</h3>
+            
+            <div class="card" style="margin-bottom: 2rem;">
+                <h3 style="color: var(--primary);">1. Data Ingestion (Airbyte)</h3>
+                <p><strong>What happens:</strong> Airbyte connectors extract data from CRM, Stripe, PostgreSQL, and marketing platforms.</p>
+                <p style="margin-top: 1rem;"><strong>How:</strong> Incremental syncs load only new/changed records. Retry logic handles failures. Schema changes detected automatically.</p>
+                <p style="margin-top: 1rem; color: var(--text-gray); font-size: 0.9rem;">💡 Result: Fresh raw data in BigQuery daily</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 2rem;">
+                <h3 style="color: var(--primary);">2. Warehouse Loading (BigQuery Raw)</h3>
+                <p><strong>What happens:</strong> Raw untransformed data is stored in BigQuery's raw layer.</p>
+                <p style="margin-top: 1rem;"><strong>Why:</strong> Immutable source of truth. Supports audit trails. Easy to troubleshoot transformation issues.</p>
+                <p style="margin-top: 1rem; color: var(--text-gray); font-size: 0.9rem;">💡 Result: Centralized data repository with full history</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 2rem;">
+                <h3 style="color: var(--primary);">3. Data Transformation (dbt)</h3>
+                <p><strong>What happens:</strong> dbt executes SQL models to clean, standardize, and combine data.</p>
+                <p style="margin-top: 1rem;"><strong>Layers:</strong></p>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                    <li><strong>Staging:</strong> Clean raw data (dedup, type casting, filtering)</li>
+                    <li><strong>Intermediate:</strong> Create business logic tables (joins, calculations)</li>
+                    <li><strong>Marts:</strong> Pre-aggregated analytics tables optimized for BI</li>
+                </ul>
+                <p style="margin-top: 1rem; color: var(--text-gray); font-size: 0.9rem;">💡 Result: Business-ready data with full documentation and tests</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 2rem;">
+                <h3 style="color: var(--primary);">4. Quality Validation (Great Expectations)</h3>
+                <p><strong>What happens:</strong> Automated checks validate data freshness, completeness, accuracy, and consistency.</p>
+                <p style="margin-top: 1rem;"><strong>Checks:</strong> No negative revenue, no future dates, no missing customer IDs, primary keys unique, foreign keys valid.</p>
+                <p style="margin-top: 1rem;"><strong>On Failure:</strong> Pipeline stops. Alerts sent. Data team investigates.</p>
+                <p style="margin-top: 1rem; color: var(--text-gray); font-size: 0.9rem;">💡 Result: Only high-quality data reaches downstream consumers</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 2rem;">
+                <h3 style="color: var(--primary);">5. Orchestration (Airflow)</h3>
+                <p><strong>What happens:</strong> Apache Airflow manages the entire daily workflow.</p>
+                <p style="margin-top: 1rem;"><strong>Daily Schedule:</strong> Runs at 2 AM to ensure fresh data by business hours.</p>
+                <p style="margin-top: 1rem;"><strong>On Failure:</strong> Automatic retries (3x). If still fails, alerts sent immediately.</p>
+                <p style="margin-top: 1rem; color: var(--text-gray); font-size: 0.9rem;">💡 Result: Reliable, automated, monitored pipeline</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 2rem;">
+                <h3 style="color: var(--primary);">6. Analytics Access (BI & Dashboards)</h3>
+                <p><strong>What happens:</strong> Business users query trusted data via BI tools like Looker or Tableau.</p>
+                <p style="margin-top: 1rem;"><strong>Role-Based Access:</strong> Executives see dashboards. Analysts query marts. Data engineers see raw layer.</p>
+                <p style="margin-top: 1rem;"><strong>Self-Service:</strong> Pre-built dashboards + ability to create custom reports.</p>
+                <p style="margin-top: 1rem; color: var(--text-gray); font-size: 0.9rem;">💡 Result: Fast insights. No data bottlenecks.</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 2rem;">
+                <h3 style="color: var(--primary);">7. AI Analytics (LangChain)</h3>
+                <p><strong>What happens:</strong> Users ask natural language questions. LLM generates SQL. Results returned.</p>
+                <p style="margin-top: 1rem;"><strong>Example:</strong> "Why did revenue drop?" → LLM generates SQL → BigQuery executes → Answer formatted</p>
+                <p style="margin-top: 1rem;"><strong>Safety:</strong> Validation layer prevents malicious queries. Query limits enforced.</p>
+                <p style="margin-top: 1rem; color: var(--text-gray); font-size: 0.9rem;">💡 Result: Non-technical users get instant insights</p>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">🔐 Governance & Security</h3>
+            <div class="grid">
+                <div class="card">
+                    <h3>👤 Role-Based Access</h3>
+                    <p><strong>Data Engineer:</strong> Full read/write on all layers</p>
+                    <p><strong>Analyst:</strong> Read-only on marts</p>
+                    <p><strong>Executive:</strong> Dashboard only</p>
+                </div>
+                <div class="card">
+                    <h3>🔒 Data Security</h3>
+                    <p><strong>Encryption:</strong> In transit (TLS 1.3) and at rest (Google-managed keys)</p>
+                    <p><strong>Credentials:</strong> Stored in Secret Manager, rotated every 90 days</p>
+                    <p><strong>No secrets in code</strong> - All hardcoded in CI/CD</p>
+                </div>
+                <div class="card">
+                    <h3>📝 Audit Logging</h3>
+                    <p><strong>Query Logging:</strong> All BigQuery queries logged for compliance</p>
+                    <p><strong>Pipeline Execution:</strong> Logged to Cloud Logging</p>
+                    <p><strong>Data Lineage:</strong> Tracked via dbt metadata</p>
+                </div>
+                <div class="card">
+                    <h3>✅ Data Quality</h3>
+                    <p><strong>Great Expectations:</strong> Automated quality checks</p>
+                    <p><strong>Testing:</strong> dbt tests on every transformation</p>
+                    <p><strong>Validation:</strong> Schema, volume, and anomaly detection</p>
+                </div>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--text-light);">📊 Business Value</h3>
+            <div class="grid">
+                <div class="card">
+                    <h3>⚡ Speed</h3>
+                    <p>Fresh data daily. Insights in seconds. No manual data preparation.</p>
+                </div>
+                <div class="card">
+                    <h3>💰 Cost</h3>
+                    <p>Serverless architecture. Pay only for compute used. Automated optimization.</p>
+                </div>
+                <div class="card">
+                    <h3>🎯 Accuracy</h3>
+                    <p>Validated data. Documented transformations. Audit trail for compliance.</p>
+                </div>
+                <div class="card">
+                    <h3>🚀 Scale</h3>
+                    <p>Handles TB+ data. Parallel processing. No manual interventions.</p>
+                </div>
+                <div class="card">
+                    <h3>🤖 AI Ready</h3>
+                    <p>Clean data. Semantic layer. LLM integration. Natural language queries.</p>
+                </div>
+                <div class="card">
+                    <h3>👥 Self-Service</h3>
+                    <p>No data bottleneck. Analysts empower. Execs get dashboards. All from same source.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p style="margin-bottom: 1rem;"><strong>Modern Analytics Data Platform Blueprint</strong></p>
+            <p>Production-grade architecture for governed, scalable, AI-ready analytics</p>
+            <p style="margin-top: 2rem; font-size: 0.85rem;">Built with: BigQuery • dbt • Airbyte • Airflow • LangChain</p>
+            <p style="margin-top: 1rem; color: #64748b; font-size: 0.8rem;">© 2025 Analytics Engineering Handbook</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+                
+                btn.classList.add('active');
+                const section = document.getElementById(btn.dataset.section);
+                section.classList.add('active');
+                window.scrollTo(0, 0);
+            });
+        });
+
+        // Expandable sections
+        document.querySelectorAll('.expandable-header').forEach(header => {
+            header.addEventListener('click', () => {
+                header.nextElementSibling.classList.toggle('show');
+            });
+        });
+    </script>
+</body>
+</html>

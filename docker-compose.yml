@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: analytics_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-demo_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-demo_password}
+      POSTGRES_DB: ${POSTGRES_DB:-analytics}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-demo_user} -d ${POSTGRES_DB:-analytics}"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+    networks:
+      - analytics_network
+
+  dashboard:
+    image: python:3.11-slim
+    container_name: analytics_dashboard
+    working_dir: /app
+    command: >
+      sh -c "pip install --no-cache-dir -r requirements.txt &&
+             python pipelines/ingestion.py &&
+             python quality/checks.py &&
+             dbt run --project-dir dbt --profiles-dir dbt &&
+             streamlit run dashboard/app.py --server.address=0.0.0.0 --server.port=8501"
+    environment:
+      DATABASE_USER: ${DATABASE_USER:-demo_user}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-demo_password}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${DATABASE_NAME:-analytics}
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - analytics_network
+
+  airflow:
+    image: apache/airflow:2.9.3-python3.11
+    container_name: analytics_airflow
+    command: standalone
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW__CORE__LOAD_EXAMPLES:-False}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DATABASE_USER:-demo_user}:${DATABASE_PASSWORD:-demo_password}@postgres:5432/${DATABASE_NAME:-analytics}
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
+      _PIP_ADDITIONAL_REQUIREMENTS: "pandas==2.2.2 psycopg2-binary==2.9.9 SQLAlchemy==2.0.31 dbt-postgres==1.8.2"
+      DATABASE_USER: ${DATABASE_USER:-demo_user}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-demo_password}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${DATABASE_NAME:-analytics}
+    user: "${AIRFLOW_UID:-50000}:0"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./pipelines:/opt/airflow/pipelines
+      - ./quality:/opt/airflow/quality
+      - ./dbt:/opt/airflow/dbt
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - analytics_network
+
+volumes:
+  postgres_data:
+
+networks:
+  analytics_network:
+    driver: bridge

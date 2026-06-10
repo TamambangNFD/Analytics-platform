@@ -1,0 +1,33 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+.dbt/
+logs/
+postgres_data/
+airflow/logs/
+airflow/plugins/
+target/
+dbt/target/
+dbt/logs/
+# Python
+__pycache__/
+*.pyc
+venv/
+.env
+
+# Database
+*.db
+
+# Docker
+docker-data/
+
+# VS Code
+.vscode/
+
+# Airflow
+logs/
+
+# OS
+.DS_Store
+Thumbs.db

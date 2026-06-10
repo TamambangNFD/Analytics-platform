@@ -1,0 +1,12 @@
+analytics_platform:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DATABASE_HOST', 'localhost') }}"
+      user: "{{ env_var('DATABASE_USER', 'demo_user') }}"
+      password: "{{ env_var('DATABASE_PASSWORD', 'demo_password') }}"
+      port: "{{ env_var('DATABASE_PORT', 5432) | int }}"
+      dbname: "{{ env_var('DATABASE_NAME', 'analytics') }}"
+      schema: analytics
+      threads: 4

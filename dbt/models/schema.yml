@@ -1,0 +1,57 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: customers
+        columns:
+          - name: customer_id
+            tests:
+              - unique
+              - not_null
+
+models:
+  - name: stg_customers
+    description: Cleaned customer records from the raw warehouse layer.
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: source('raw', 'customers')
+              field: customer_id
+      - name: email
+        tests:
+          - not_null
+      - name: monthly_revenue
+        tests:
+          - not_null
+      - name: status
+        tests:
+          - not_null
+
+  - name: customer_metrics
+    description: Current customer counts and churn indicators.
+    columns:
+      - name: total_customers
+        tests:
+          - not_null
+      - name: active_customers
+        tests:
+          - not_null
+      - name: churn_rate
+        tests:
+          - not_null
+
+  - name: revenue_metrics
+    description: Monthly revenue metrics by customer signup month.
+    columns:
+      - name: revenue_month
+        tests:
+          - unique
+          - not_null
+      - name: total_revenue
+        tests:
+          - not_null
