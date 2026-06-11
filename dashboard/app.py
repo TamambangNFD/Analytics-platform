@@ -76,3 +76,19 @@ st.plotly_chart(
     px.pie(country_counts, names="country", values="customers", title="Country Distribution"),
     use_container_width=True,
 )
+
+
+import requests
+
+response=requests.get(
+"https://analytics-api.onrender.com/revenue"
+)
+
+
+data=response.json()
+
+
+st.metric(
+"Revenue",
+data["revenue"]
+)
