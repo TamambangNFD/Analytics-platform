@@ -134,3 +134,40 @@ Replace these values with your production environment credentials.
 ## Offline Blueprint
 
 Open `docs/data_platform_blueprint.html` in a browser for an offline architecture walkthrough.
+
+
+## Live Demo
+
+Dashboard:
+https://analytics-platform.streamlit.app
+
+
+API:
+
+https://analytics-api.onrender.com
+
+
+
+## Architecture
+
+Data Sources
+
+↓
+
+Airbyte
+
+↓
+
+Warehouse
+
+↓
+
+dbt
+
+↓
+
+Dashboard
+
+↓
+
+AI Assistant
