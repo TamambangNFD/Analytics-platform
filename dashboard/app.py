@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 from sqlalchemy import create_engine
+import requests
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,70 +26,231 @@ def database_url() -> str:
 def load_data() -> tuple[pd.DataFrame, str]:
     try:
         engine = create_engine(database_url(), pool_pre_ping=True)
-        customers = pd.read_sql("select * from analytics.stg_customers", engine)
+
+        customers = pd.read_sql(
+            "select * from analytics.stg_customers",
+            engine
+        )
+
         return customers, "warehouse"
+
     except Exception:
-        customers = pd.read_csv(CSV_PATH, comment="#")
-        customers["signup_date"] = pd.to_datetime(customers["signup_date"])
+
+        customers = pd.read_csv(
+            CSV_PATH,
+            comment="#"
+        )
+
         return customers, "demo CSV"
 
 
-st.set_page_config(page_title="Analytics Intelligence Platform", layout="wide")
+st.set_page_config(
+    page_title="Analytics Intelligence Platform",
+    layout="wide"
+)
+
+
 st.title("Analytics Intelligence Platform")
 
+
 customers, source = load_data()
-customers["signup_date"] = pd.to_datetime(customers["signup_date"])
-customers["monthly_revenue"] = pd.to_numeric(customers["monthly_revenue"])
-customers["status"] = customers["status"].str.lower()
+
+
+# -----------------------------
+# CLEAN DATA
+# -----------------------------
+
+customers.columns = (
+    customers.columns
+    .str.lower()
+    .str.strip()
+)
+
+
+customers["signup_date"] = pd.to_datetime(
+    customers["signup_date"]
+)
+
+
+customers["monthly_revenue"] = pd.to_numeric(
+    customers["monthly_revenue"],
+    errors="coerce"
+)
+
+
+customers["status"] = (
+    customers["status"]
+    .str.lower()
+)
+
+
+# -----------------------------
+# KPI METRICS
+# -----------------------------
 
 total_revenue = customers["monthly_revenue"].sum()
+
 total_customers = len(customers)
-active_customers = int((customers["status"] == "active").sum())
-churn_rate = float((customers["status"] == "churned").sum() / total_customers) if total_customers else 0.0
+
+active_customers = int(
+    (customers["status"] == "active").sum()
+)
+
+
+churn_rate = (
+    float(
+        (customers["status"] == "churned").sum()
+        / total_customers
+    )
+    if total_customers
+    else 0.0
+)
+
 
 st.caption(f"Data source: {source}")
+
+
 metric_cols = st.columns(4)
-metric_cols[0].metric("Total Revenue", f"${total_revenue:,.0f}")
-metric_cols[1].metric("Total Customers", f"{total_customers:,}")
-metric_cols[2].metric("Active Customers", f"{active_customers:,}")
-metric_cols[3].metric("Churn Rate", f"{churn_rate:.1%}")
+
+
+metric_cols[0].metric(
+    "Total Revenue",
+    f"${total_revenue:,.0f}"
+)
+
+
+metric_cols[1].metric(
+    "Total Customers",
+    f"{total_customers:,}"
+)
+
+
+metric_cols[2].metric(
+    "Active Customers",
+    f"{active_customers:,}"
+)
+
+
+metric_cols[3].metric(
+    "Churn Rate",
+    f"{churn_rate:.1%}"
+)
+
+
+
+# -----------------------------
+# MONTHLY REVENUE
+# -----------------------------
+
 
 monthly = (
-    customers.assign(signup_month=customers["signup_date"].dt.to_period("M").dt.to_timestamp())
+    customers
+    .assign(
+        signup_month=
+        customers["signup_date"]
+        .dt.to_period("M")
+        .dt.to_timestamp()
+    )
     .groupby("signup_month", as_index=False)
-    .agg(total_revenue=("monthly_revenue", "sum"), customers=("customer_id", "count"))
+    .agg(
+        total_revenue=("monthly_revenue", "sum"),
+        customers=("customer_id", "count")
+    )
 )
+
+
 
 left, right = st.columns(2)
+
+
 with left:
+
     st.plotly_chart(
-        px.line(monthly, x="signup_month", y="total_revenue", markers=True, title="Revenue by Signup Month"),
-        use_container_width=True,
+        px.line(
+            monthly,
+            x="signup_month",
+            y="total_revenue",
+            markers=True,
+            title="Revenue by Signup Month"
+        ),
+        use_container_width=True
     )
+
+
 with right:
+
     st.plotly_chart(
-        px.bar(monthly, x="signup_month", y="customers", title="Customer Growth"),
-        use_container_width=True,
+        px.bar(
+            monthly,
+            x="signup_month",
+            y="customers",
+            title="Customer Growth"
+        ),
+        use_container_width=True
     )
 
-country_counts = customers.groupby("country", as_index=False).agg(customers=("customer_id", "count"))
+
+
+# -----------------------------
+# COUNTRY DISTRIBUTION
+# -----------------------------
+
+
+country_counts = (
+    customers
+    .groupby("country", as_index=False)
+    .agg(
+        customers=("customer_id", "count")
+    )
+)
+
+
 st.plotly_chart(
-    px.pie(country_counts, names="country", values="customers", title="Country Distribution"),
-    use_container_width=True,
+    px.pie(
+        country_counts,
+        names="country",
+        values="customers",
+        title="Country Distribution"
+    ),
+    use_container_width=True
 )
 
 
-import requests
 
-response=requests.get(
-"https://analytics-api.onrender.com/revenue"
-)
-
-
-data=response.json()
+# -----------------------------
+# API REVENUE
+# -----------------------------
 
 
-st.metric(
-"Revenue",
-data["revenue"]
-)
+try:
+
+    response = requests.get(
+        "https://analytics-api.onrender.com/revenue",
+        timeout=10
+    )
+
+
+    response.raise_for_status()
+
+
+    data = response.json()
+
+
+    # FIX HERE:
+    api_revenue = data.get(
+        "revenue",
+        data.get("monthly_revenue", 0)
+    )
+
+
+    st.metric(
+        "API Revenue",
+        f"${api_revenue:,.0f}"
+    )
+
+
+except Exception as e:
+
+    st.warning(
+        f"API revenue unavailable: {e}"
+    )

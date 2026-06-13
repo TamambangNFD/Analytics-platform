@@ -139,11 +139,10 @@ Open `docs/data_platform_blueprint.html` in a browser for an offline architectur
 ## Live Demo
 
 Dashboard:
-https://analytics-platform.streamlit.app
+https://analytics-platform-8o8c2ammxsak48emxxwzyy.streamlit.app/
 
 
 API:
-
 https://analytics-api.onrender.com
 
 
